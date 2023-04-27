@@ -1,8 +1,11 @@
 import React, { useState} from "react";
-import { StyleSheet, Text,View, FlatList} from 'react-native';
+import { StyleSheet, Text,View, FlatList, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import Header from './components/header';
 import ToDoItem from './components/ToDoItem';
 import AddToDo from './components/AddToDo';
+import Sandbox from './components/sandbox';
+import { styleProps } from "react-native-web/dist/cjs/modules/forwardedProps";
+
 
 export default function App(){
     const [todos, setTodos] = useState([
@@ -18,48 +21,63 @@ export default function App(){
     }
 
     const submitHandler=(text) =>{
-        setTodos((prevTodos)=> {
-            return [
-                { text: text, key:Math.random().toString()},
-                ...prevTodos
-            ]
-        })
+
+
+        if(text.length > 3){
+
+            setTodos((prevTodos)=> {
+                return [
+                    { text: text, key:Math.random().toString()},
+                    ...prevTodos
+                ];
+            });
+        } else{
+            Alert.alert('OOPS!','Todos must be longer than 3',[
+                {text: 'Understood', onPress: () => console.log('alert closed')}
+            ])
+        }
+
+
+      
     }
 
     return (
-        <View style={StyleSheet.container}>
-            <Header/>
+        // <Sandbox/>
+        <TouchableWithoutFeedback onPress={() => {
+            Keyboard.dismiss();
+            console.log('dismissed keyboard');
+        }}>
 
-            <View style={styles.content}>
-                < AddToDo submitHandler={submitHandler}/>
-                <View style={styles.list}>
-                    <FlatList
-                    data={todos}
-                    renderItem={({item})=>(
-                        <ToDoItem item={item} pressHandler={pressHandler}/>
-
-                    )}      
-                    />
-
+        
+            <View style={styles.container}>
+                <Header/>
+                <View style={styles.content}>
+                    < AddToDo submitHandler={submitHandler}/>
+                    <View style={styles.list}>
+                        <FlatList
+                        data={todos}
+                        renderItem={({item})=>(
+                            <ToDoItem item={item} pressHandler={pressHandler}/>
+                        )}                       
+                        />
+                    </View>
                 </View>
-
-
             </View>
-
-        </View>
+        </TouchableWithoutFeedback>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#fff',
+        flex:1,
 
     },
     content: {
         padding: 40, 
+        flex:1
     },
     list:{
         marginTop: 20,
+        flex:1
     }
 });
